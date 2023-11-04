@@ -92,6 +92,10 @@ async def send_email_with_attachment(client_data=None, bdika_gilui_data=None, at
         if attachment_url:
             # Скачиваем файл в оперативную память
             response = requests.get(attachment_url)
+            if response.status_code == 200:
+                logger.debug("Файл успешно скачан")
+            else:
+                logger.error(f"Ошибка скачивания файла: статус код {response.status_code}")
             byte_stream = BytesIO(response.content)
             attach = MIMEApplication(byte_stream.read(), _subtype="pdf")
             attach.add_header('Content-Disposition', 'attachment', filename=attachment_filename)

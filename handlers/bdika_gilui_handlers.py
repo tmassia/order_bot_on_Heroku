@@ -116,7 +116,8 @@ async def process_file_upload(message: Message, state: FSMContext):
     async with AsyncSessionLocal() as session:
         try:
             data = await state.get_data()
-
+            client_id = data.get('client_id')  # Используем правильный ключ
+            print(f"Debug: client_id = {client_id}")
             bdika_gilui_id = data.get('bdika_gilui_id')
             # Создаем объект запроса и фильтруем его по ID
             bdika_gilui = await session.execute(select(BdikaGilui).filter_by(id=bdika_gilui_id))
@@ -147,6 +148,7 @@ async def process_proceed_to_order(callback: types.CallbackQuery, state: FSMCont
     async with AsyncSessionLocal() as session:
         try:
             data = await state.get_data()
+            bdika_gilui_id = data.get('bdika_gilui_id')
             client_id = data.get('client_id')  # Используем правильный ключ
             print(f"Debug: client_id = {client_id}")
 
@@ -159,7 +161,7 @@ async def process_proceed_to_order(callback: types.CallbackQuery, state: FSMCont
             # Извлекаем все поля
             all_client_data = {column.name: getattr(client_data, column.name) for column in Client.__table__.columns}
 
-            bdika_gilui_data = await session.execute(select(BdikaGilui).filter_by(id_order=client_id))
+            bdika_gilui_data = await session.execute(select(BdikaGilui).filter_by(id_order=bdika_gilui_id))
             bdika_gilui_data = bdika_gilui_data.scalars().all()
             all_bdika_gilui_data = [
                 {column.name: getattr(record, column.name) for column in BdikaGilui.__table__.columns} for record in
@@ -189,13 +191,13 @@ async def process_proceed_to_order(callback: types.CallbackQuery, state: FSMCont
                                                  bdika_gilui_data=filtered_bdika_gilui_data,
                                                  attachment_url=file_path, attachment_filename=file_name)
                 await callback.message.answer("הזמנה נשלחה בהצלחה!=)")
+                await session.commit()
             except Exception as e:
                 await callback.message.answer(f"טעות בשליחת דואל: {e}")
                 logger.error(f"Exception occurred: {e}")
                 logger.error(traceback.format_exc())
             finally:
                 await session.close()
-                await callback.message.answer("session.close")
         except Exception as e:
             await callback.message.answer(f"טעות בשליחת דואל: {e}")
             logger.error(f"Exception occurred: {e}")
@@ -250,6 +252,8 @@ async def process_proceed_to_order_no_doc(callback: types.CallbackQuery, state: 
                 logger.error(f"Exception occurred: {e}")
                 logger.error(traceback.format_exc())
                 raise
+            finally:
+                await session.close()
             # Оставляем только нужные поля
             required_client_fields = ['id', 'client_name', 'shem_hevra', 'telefon']
             required_bdika_gilui_fields = ['id', 'makom_shembg', 'makom_yehudbg', 'makom_ktovetbg', 'kamut_galaimbg',
@@ -272,6 +276,8 @@ async def process_proceed_to_order_no_doc(callback: types.CallbackQuery, state: 
                 await callback.message.answer(f"טעות בשליחת דואל:{e}")
                 logger.error(f"Exception occurred: {e}")
                 logger.error(traceback.format_exc())
+            finally:
+                await session.close()
         except Exception as e:
             await callback.message.answer(f"טעות בשליחת דואל:{e}")
             logger.error(f"Exception occurred: {e}")
