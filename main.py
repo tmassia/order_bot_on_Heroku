@@ -26,7 +26,7 @@ HEROKU_APP_NAME = os.getenv('HEROKU_APP_NAME')
 # Настройки веб-сервера
 WEB_SERVER_HOST = '0.0.0.0'  # Слушать все сетевые интерфейсы
 WEB_SERVER_PORT = os.environ.get('PORT')  # Порт, предоставленный Heroku
-WEBHOOK_SECRET_PATH = f"/{BOT_TOKEN}"  # Уникальный путь для вебхука
+WEBHOOK_SECRET_PATH = f"{BOT_TOKEN}"  # Уникальный путь для вебхука
 BASE_WEBHOOK_URL = f"https://{HEROKU_APP_NAME}.herokuapp.com/{WEBHOOK_SECRET_PATH}"
 
 # Создаем роутер
