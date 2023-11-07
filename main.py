@@ -26,7 +26,7 @@ HEROKU_APP_NAME = os.getenv('HEROKU_APP_NAME')
 # Настройки веб-сервера
 WEB_SERVER_HOST = '0.0.0.0'  # Слушать все сетевые интерфейсы
 WEB_SERVER_PORT = int(os.getenv('PORT', 5000))  # Порт, предоставленный Heroku
-# WEBHOOK_SECRET_PATH = f"/{TOKEN}"  # Уникальный путь для вебхука
+WEBHOOK_SECRET_PATH = f"/{BOT_TOKEN}"  # Уникальный путь для вебхука
 BASE_WEBHOOK_URL = f"https://{HEROKU_APP_NAME}.herokuapp.com{BOT_TOKEN}"
 
 # Создаем роутер
@@ -62,7 +62,7 @@ def main() -> None:
         bot=bot
     )
     # Register webhook handler on application
-    webhook_requests_handler.register(app, path=BOT_TOKEN)
+    webhook_requests_handler.register(app, path=WEBHOOK_SECRET_PATH)
     # Mount dispatcher startup and shutdown hooks to aiohttp application
     setup_application(app, dp, bot=bot)
     # And finally start webserver
