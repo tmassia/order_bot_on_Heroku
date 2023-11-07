@@ -11,6 +11,7 @@ from db.db_config import AsyncSessionLocal
 from db.models import BdikaGilui, Client
 import logging
 from sqlalchemy import select
+from aiogram import Bot
 
 import traceback
 
@@ -105,8 +106,8 @@ async def process_upload_document(callback: types.CallbackQuery, state: FSMConte
 
 # Handler for the "FileUploadBG" state
 @bdika_gilui_router.message(BdikaGiluiForm.FileUploadBG)
-async def process_file_upload(message: Message, state: FSMContext):
-    destination_path, file_name = await download_document(message)
+async def process_file_upload(message: Message, state: FSMContext, bot: Bot):
+    destination_path, file_name = await download_document(message, bot)
     try:
         await state.update_data(file_url=destination_path, file_name=file_name)
     except Exception as e:

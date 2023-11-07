@@ -10,6 +10,7 @@ import traceback
 import requests
 from b2sdk.v1 import InMemoryAccountInfo, B2Api
 from io import BytesIO
+from aiogram import Bot
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -25,17 +26,18 @@ bucket = b2_api.get_bucket_by_name(bucket_name)
 email_to = os.getenv('SMTP_reciever')
 app_password = os.getenv('SMTP_APP_PASSWORD')
 sender_email = os.getenv('SMTP_sender')
+
+
 # downloads_directory = os.getenv('directory')
 
 
-async def download_document(message: Message):
-    from main import bot as main_bot
-    file_info = await main_bot.get_file(message.document.file_id, request_timeout=120)
+async def download_document(message: Message, bot: Bot):
+    file_info = await bot.get_file(message.document.file_id, request_timeout=120)
     file_path_on_telegram = file_info.file_path
     file_name = message.document.file_name  # Используем имя файла из сообщения
 
     # Загрузка файла с Telegram
-    byte_data = await main_bot.download_file(file_path_on_telegram)
+    byte_data = await bot.download_file(file_path_on_telegram)
     # Загрузка файла в Backblaze B2
     byte_data = byte_data.read()
     bucket.upload_bytes(byte_data, file_name)
