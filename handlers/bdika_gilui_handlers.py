@@ -29,7 +29,21 @@ markup = InlineKeyboardMarkup(inline_keyboard=[
 # Handler for the "MakomShemBG" state
 @bdika_gilui_router.message(BdikaGiluiForm.MakomShemBG)
 async def process_makom_shembg(message: Message, state: FSMContext):
+    # data = await state.get_data()
+    # client_id = data.get('client_id')  # Extract client_id from state
+    # if client_id is None:
+    #     # Если client_id не найден, сообщите об этом пользователю и прекратите действие.
+    #     await message.reply("טעות: client_id не найден.")
+    #     return  # Прекратить выполнение, если client_id отсутствует
     await state.update_data(makom_shembg=message.text)
+    # Передаем client_id в следующее состояние
+    data = await state.get_data()
+    client_id = data.get('client_id')
+
+    if client_id is None:
+        # Если client_id не найден, сообщите об этом пользователю и прекратите действие.
+        await message.reply("טעות: client_id не найден.")
+        return  # Прекратить выполнение, если client_id отсутствует
     await state.set_state(BdikaGiluiForm.MakomYehudBG)
     await message.reply("מה ייעוד המבנה :")
 
@@ -38,6 +52,14 @@ async def process_makom_shembg(message: Message, state: FSMContext):
 @bdika_gilui_router.message(BdikaGiluiForm.MakomYehudBG)
 async def process_makom_yehudbg(message: Message, state: FSMContext):
     await state.update_data(makom_yehudbg=message.text)
+    # Передаем client_id в следующее состояние
+    data = await state.get_data()
+    client_id = data.get('client_id')
+
+    if client_id is None:
+        # Если client_id не найден, сообщите об этом пользователю и прекратите действие.
+        await message.reply("טעות: client_id не найден.")
+        return  # Прекратить выполнение, если client_id отсутствует
     await state.set_state(BdikaGiluiForm.MakomKtovetBG)
     await message.reply("מה כתובת מקום הבדיקה:")
 
@@ -46,6 +68,14 @@ async def process_makom_yehudbg(message: Message, state: FSMContext):
 @bdika_gilui_router.message(BdikaGiluiForm.MakomKtovetBG)
 async def process_makom_ktovetbg(message: Message, state: FSMContext):
     await state.update_data(makom_ktovetbg=message.text)
+    # Передаем client_id в следующее состояние
+    data = await state.get_data()
+    client_id = data.get('client_id')
+
+    if client_id is None:
+        # Если client_id не найден, сообщите об этом пользователю и прекратите действие.
+        await message.reply("טעות: client_id не найден.")
+        return  # Прекратить выполнение, если client_id отсутствует
     await state.set_state(BdikaGiluiForm.MakomLocationBG)
     await message.reply("שלח לינק מיקום :")
 
@@ -54,6 +84,14 @@ async def process_makom_ktovetbg(message: Message, state: FSMContext):
 @bdika_gilui_router.message(BdikaGiluiForm.MakomLocationBG)
 async def process_makom_locationbg(message: Message, state: FSMContext):
     await state.update_data(makom_locationbg=message.text)
+    # Передаем client_id в следующее состояние
+    data = await state.get_data()
+    client_id = data.get('client_id')
+
+    if client_id is None:
+        # Если client_id не найден, сообщите об этом пользователю и прекратите действие.
+        await message.reply("טעות: client_id не найден.")
+        return  # Прекратить выполнение, если client_id отсутствует
     await state.set_state(BdikaGiluiForm.KamutGalaimBG)
     await message.reply("רשום כמות גלאים :")
 
@@ -62,6 +100,13 @@ async def process_makom_locationbg(message: Message, state: FSMContext):
 @bdika_gilui_router.message(BdikaGiluiForm.KamutGalaimBG)
 async def process_kamut_galaimbgb(message: Message, state: FSMContext):
     await state.update_data(kamut_galaimbg=message.text)
+    # Передаем client_id в следующее состояние
+    data = await state.get_data()
+    client_id = data.get('client_id')
+    if client_id is None:
+        # Если client_id не найден, сообщите об этом пользователю и прекратите действие.
+        await message.reply("טעות: client_id не найден.")
+        return  # Прекратить выполнение, если client_id отсутствует
     await state.set_state(BdikaGiluiForm.CheckDateBG)
     await message.reply("תאריך בדיקה נא לכתוב כדוגמא   '01/01/2024' או '01.01.2024':")
 
@@ -75,6 +120,10 @@ async def process_check_datebg(message: types.Message, state: FSMContext):
         try:
             data = await state.get_data()
             client_id = data.get('client_id')  # Extract client_id from state
+            if client_id is None:
+                # Если client_id не найден, сообщите об этом пользователю и прекратите действие.
+                await message.reply("טעות: client_id не найден.")
+                return  # Прекратить выполнение, если client_id отсутствует
             new_bdikat_gilui = BdikaGilui(
                 id_order=client_id,
                 makom_shembg=data['makom_shembg'],
@@ -266,7 +315,7 @@ async def process_proceed_to_order_no_doc(callback: types.CallbackQuery, state: 
                                          all_bdika_gilui_data]
 
             if not filtered_client_data or not filtered_bdika_gilui_data:
-                await callback.message.answer("טעות מאגר מידע:")
+                await callback.message.answer("טעות מאגר מידע איסוף מידע :")
                 return
             try:
                 await send_email_without_attachment(client_data=filtered_client_data,
