@@ -7,7 +7,7 @@ Interacting with a database to store information about clients and their orders 
 
 1- Install dependencies: pip install -r requirements.txt
 
-2- Create a .env file and fill in the necessary variables, including bot token, API keys, and SMTP settings.
+2- Create a .env file and fill in the necessary variables, including bot token, API keys, and SMTP settings,Heroku settings HEROKU_APP_NAME,BASE_WEBHOOK_URL.
 
 3- Run the script: python main.py
 
